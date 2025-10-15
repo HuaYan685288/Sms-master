@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yfy.sms.dao.Question.QuestionMapper">
+
+    <resultMap id="QuestionResultMap" type="com.yfy.sms.domain.Question">
+        <id property="questionId" column="question_id"/>
+        <result property="questionText" column="question_text"/>
+        <result property="optionA" column="option_a"/>
+        <result property="optionB" column="option_b"/>
+        <result property="optionC" column="option_c"/>
+        <result property="optionD" column="option_d"/>
+        <result property="correctAnswer" column="correct_answer"/>
+        <result property="score" column="score"/>
+    </resultMap>
+
+    <select id="findAll" resultMap="QuestionResultMap">
+        SELECT *
+        FROM question
+        WHERE 1=1
+        <if test="questionId != null and questionId != ''">
+            AND question_id LIKE CONCAT('%', #{questionId}, '%')
+        </if>
+        <if test="questionText != null and questionText != ''">
+            AND question_text LIKE CONCAT('%', #{questionText}, '%')
+        </if>
+        <if test="score != null and score != ''">
+            AND score LIKE CONCAT('%', #{score}, '%')
+        </if>
+    </select>
+
+    <select id="findById" parameterType="int" resultMap="QuestionResultMap">
+    select * from Question where question_id = #{questionId}
+    </select>
+<!--    查询试卷中内容-->
+    <select id="getQuestionsByPaperId" parameterType="int" resultMap="QuestionResultMap">
+        SELECT q.*,p.paper_name
+        FROM question q
+                 JOIN  paper_question p_q  ON q.question_id=p_q.question_id
+                 JOIN paper p ON p.paper_id=p_q.paper_id
+        WHERE p.paper_id = #{paperId}
+    </select>
+
+    <insert id="insert" parameterType="com.yfy.sms.domain.Question">
+        INSERT INTO question (question_text, option_a, option_b, option_c, option_d, correct_answer, score)
+        VALUES (#{questionText}, #{optionA}, #{optionB}, #{optionC}, #{optionD}, #{correctAnswer}, #{score})
+    </insert>
+
+    <update id="update" parameterType="com.yfy.sms.domain.Question">
+        UPDATE question
+        SET question_text = #{questionText},
+        option_a = #{optionA},
+        option_b = #{optionB},
+        option_c = #{optionC},
+        option_d = #{optionD},
+        correct_answer = #{correctAnswer},
+        score = #{score}
+        WHERE question_id = #{questionId}
+    </update>
+
+    <delete id="delete" parameterType="int">
+        DELETE FROM question WHERE question_id = #{questionId}
+    </delete>
+    <delete id="paperdelete" parameterType="int">
+        DELETE FROM paper_question WHERE question_id = #{questionId}
+    </delete>
+
+</mapper>

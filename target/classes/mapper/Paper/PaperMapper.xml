@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yfy.sms.dao.Paper.PaperMapper">
+
+    <resultMap id="PaperResultMap" type="com.yfy.sms.domain.Paper">
+        <id property="paperId" column="paper_id"/>
+        <result property="paperName" column="paper_name"/>
+        <result property="createTime" column="create_time"/>
+        <result property="questionIds" column="question_ids"/>
+    </resultMap>
+
+    <resultMap id="QuestionResultMap" type="com.yfy.sms.domain.Question">
+        <id property="questionId" column="question_id"/>
+        <result property="questionText" column="question_text"/>
+        <result property="optionA" column="option_a"/>
+        <result property="optionB" column="option_b"/>
+        <result property="optionC" column="option_c"/>
+        <result property="optionD" column="option_d"/>
+        <result property="correctAnswer" column="correct_answer"/>
+        <result property="score" column="score"/>
+    </resultMap>
+
+<!--    <resultMap id="QuestionResultMap" type="com.yfy.sms.domain.Question">-->
+<!--        <id property="question_id" column="question_id"/>-->
+<!--        <result property="question_text" column="question_text"/>-->
+<!--        <result property="option_a" column="option_a"/>-->
+<!--        <result property="option_b" column="option_b"/>-->
+<!--        <result property="option_c" column="option_c"/>-->
+<!--        <result property="option_d" column="option_d"/>-->
+<!--        <result property="correct_answer" column="correct_answer"/>-->
+<!--        <result property="score" column="score"/>-->
+<!--    </resultMap>-->
+
+    <select id="findAll" resultMap="PaperResultMap">
+        SELECT * FROM paper
+    </select>
+    <select id="getstudent" resultMap="PaperResultMap">
+        SELECT p.*
+        FROM paper p
+        WHERE p.paper_id NOT IN (
+            SELECT a.paper_id
+            FROM answer_records a
+            WHERE a.student_id = #{id}
+        )
+    </select>
+    <insert id="insert" parameterType="com.yfy.sms.domain.Paper">
+        INSERT INTO paper (paper_name, create_time)
+        VALUES (#{paperName}, #{createTime})
+    </insert>
+
+    <update id="update" parameterType="com.yfy.sms.domain.Paper">
+        UPDATE paper
+        SET paper_name = #{paperName},
+            create_time = #{createTime},
+            question_ids = #{questionIds}
+        WHERE paper_id = #{paperId}
+    </update>
+
+    <delete id="delete" parameterType="int">
+        DELETE FROM paper WHERE paper_id = #{paperId}
+    </delete>
+    <delete id="paper_question" parameterType="int">
+        DELETE FROM paper_question WHERE paper_id = #{paperId}
+    </delete>
+    <delete id="answer_records" parameterType="int">
+        DELETE FROM answer_records WHERE paper_id = #{paperId}
+    </delete>
+    <select id="findById" resultMap="PaperResultMap">
+        SELECT * FROM paper WHERE paper_id = #{paperId}
+    </select>
+
+    <insert id="addQuestionsToPaper" parameterType="map">
+        INSERT INTO paper_question (paper_id, question_id)
+        VALUES (#{params.paperId}, #{params.questionIds})
+    </insert>
+</mapper>

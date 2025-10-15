@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yfy.sms.dao.AnswerRecord.AnswerRecordMapper">
+
+    <!-- 查询所有成绩记录 -->
+    <select id="selectAll" resultType="com.yfy.sms.domain.AnswerRecord">
+        SELECT
+        ar.id AS id,
+        ar.student_id AS studentId,
+        s.real_name AS studentName,
+        ar.paper_id AS paperId,
+        p.paper_name AS paperName,
+        ar.score AS score
+        FROM
+        answer_records ar
+        LEFT JOIN student s ON ar.student_id = s.id
+        LEFT JOIN paper p ON ar.paper_id = p.paper_id
+        <where>
+            1=1
+            <if test="studentName != null and studentName != ''">
+                AND s.real_name LIKE CONCAT('%', #{studentName}, '%')
+            </if>
+            <if test="paperName != null and paperName != ''">
+                AND p.paper_name LIKE CONCAT('%', #{paperName}, '%')
+            </if>
+            <if test="score != null and score != ''">
+                AND ar.score LIKE CONCAT('%', #{score}, '%')
+            </if>
+        </where>
+    </select>
+
+</mapper>
